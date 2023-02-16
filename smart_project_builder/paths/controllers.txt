@@ -1,0 +1,5 @@
+from kivymd.uix.screen import MDScreen
+from kivy.lang import Builder
+
+class name_of_screen(MDScreen):
+    Builder.load_file("views/screen_kv")

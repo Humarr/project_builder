@@ -1,0 +1,124 @@
+from app.app import WindowManager
+from kivymd.app import MDApp
+# from kivymd.app import MDApp
+from PIL import ImageGrab
+from kivy.utils import platform, QueryDict, rgba
+from kivy.core.window import Window
+from kivy.metrics import dp, sp
+from kivy.clock import Clock
+from kivy.storage.jsonstore import JsonStore
+from kivy.lang import Builder
+from kaki.app import App
+from models.androidly import Storage
+
+# TODO: You may know an easier way to get the size of a computer display.
+resolution = ImageGrab.grab().size
+
+if platform == "linux" or platform == "win" or platform == "macosx":
+    Window.size = (350, 690)
+    Window.top = 0
+    Window.left = resolution[0] - Window.width
+# Window.size = (350, 600)
+
+
+class app_name(MDApp, App):
+    DEBUG = 1  # To enable Hot Reload
+    CLASSES = {
+        "name_screenScreen": "controllers.name_screen.name_screenScreen"
+    }
+
+    AUTORELOADER_PATHS = [
+        (".", {"recursive": True}),
+    ]
+
+    KV_FILES = [
+        "views/kv_screen.kv"
+    ]
+
+    path = Storage().storage()
+    print(path)
+    screens_store = JsonStore(f"Models/screens.json")
+
+
+    colors = QueryDict()
+    colors.primary = rgba("#143EBE")
+    colors.bg = rgba("#1f1f1f")
+    colors.secondary = rgba("#492b7c")
+    colors.warning = rgba("#c83416")
+    colors.danger = rgba("#b90000")
+    colors.success = rgba("#0F7A60")
+    colors.white = rgba("#FFFFFF")
+    colors.yellow = rgba("#f6d912")
+    colors.orange = rgba("#ed8a0a")
+    colors.black = rgba("#333333")
+    colors.grey = rgba("#f1f1f1")
+
+    fonts = QueryDict()
+    fonts.heading = 'assets/fonts/Poppins-Bold.ttf'
+    fonts.subheading = 'assets/fonts/Poppins-Regular.ttf'
+    fonts.body = 'assets/fonts/Poppins-Medium.ttf'
+
+    fonts.size = QueryDict()
+    fonts.size.heading = sp(30)
+    fonts.size.icon = sp(30)
+    fonts.size.h1 = sp(24)
+    fonts.size.h2 = sp(22)
+    fonts.size.h3 = sp(18)
+    fonts.size.h4 = sp(16)
+    fonts.size.h5 = sp(14)
+    fonts.size.h6 = sp(12)
+    fonts.size.h7 = sp(5)
+    fonts.size.bar = sp(3)
+
+    images = QueryDict()
+
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.wm = WindowManager()
+
+
+
+
+
+    def build_app(self):
+
+        # Create a list of all screen, loop through it and add it to the screenmanager
+        # and return the screenmanager.
+        self.theme_cls.primary_hue = "A100"
+        self.theme_cls.material_style = "M3"
+        # self.theme_cls.theme_style = "Dark"
+        self.wm = WindowManager()
+
+
+        self.wm.change_screen("kv_screen")
+
+        return self.wm
+
+
+    def on_start(self):
+        Clock.schedule_once(lambda ev: self.post_build_init(ev), 1)
+
+
+    def post_build_init(self, ev):
+        from kivy.base import EventLoop
+        EventLoop.window.bind(on_keyboard=self.hook_keyboard)
+
+    def hook_keyboard(self, window, key, *largs):
+        if key == 27:
+
+            print(self.wm.current)
+            if(self.wm.current == 'login'):
+                self.pop_exit()
+            if(self.wm.current == 'home'):
+                self.wm.pop_exit()
+            else:
+                self.goback()
+            return True
+
+
+
+
+
+if __name__ == '__main__':
+    app_name().run()

@@ -1,0 +1,157 @@
+
+
+
+<Item>
+
+
+
+
+<MyButton>
+    elevation: 3
+    size_hint_x: None
+    width: "250dp"
+    size_hint_y: .2
+    md_bg_color: "purple"
+    radius: [20]
+    MDLabel:
+        text: root.text
+        font_style: "Button"
+        halign: "center"
+        theme_text_color: "Custom"
+        text_color: "white"
+        font_size: "16sp"
+        pos_hint: {'center_x': 0.5,'center_y': 0.35}
+        bold:True
+    MDIcon:
+        icon: "folder"
+        font_size: "80sp"
+        theme_text_color: "Custom"
+        text_color: "white"
+        pos_hint: {'center_x': 0.5,'center_y': 0.75}
+        bold:True
+
+<TextField>
+    text: field.text
+    adaptive_height: True
+    size_hint_x: .9
+    padding: "30dp"
+    MDCard:
+        id: card
+        ripple_behavior: True
+        radius: [10]
+        padding: "30dp"
+        size_hint_y: None
+        height: self.minimum_height
+        elevation: 3
+        md_bg_color: "white"
+        pos_hint: {'center_x': 0.5,'center_y': 0.5}
+
+    MDTextField:
+        id: field
+        mode:"fill"
+        fill_color_normal: "white"
+        fill_color_focus: "white"
+        radius: [20]
+        hint_text: root.hint
+        hint_text_color_normal: "grey"
+        hint_text_color_focus: "grey"
+        line_color_normal: "purple"
+        line_color_focus: "purple"
+        pos_hint: {'center_x': 0.5,'center_y': 0.5}
+        text_color_normal: "black"
+        text_color_focus: "black"
+        active_line: False
+        text: root.text
+        # focus: True
+        # input_filter: "str"
+        # adaptive_height: True
+<MyCheckButton>
+    # md_bg_color: "red"
+    spacing: '0dp'
+    adaptive_height: True
+
+    MDCheckbox:
+        size_hint: None, None
+        size: "48dp", "48dp"
+        on_active:
+            print(f"False:: {root.checked}")
+            root.checked = True if root.checked == False else False
+            print(f"True:: {root.checked}")
+        # group: root.group
+
+    MDLabel:
+        text: root.text
+        adaptive_height: True
+        theme_text_color: "Custom"
+        text_color: "#B2B6AE"
+        pos_hint: {"center_y": .5}
+
+<Home>
+    MDFloatLayout:
+        md_bg_color: "white"
+        # padding: "30dp"
+        # spacing: "10dp"
+        # MDBoxLayout:
+        #     adaptive_height: True
+        MDLabel:
+            id: path
+            text: "project path: "
+            markup: True
+            adaptive_height: True
+            theme_text_color: "Custom"
+            text_color: "#B90000"
+            halign: "center"
+            pos_hint: {"center_y": .72}
+        MyButton:
+            text: "Choose project Folder"
+            pos_hint: {'center_x': 0.5,'center_y': 0.85}
+            on_press:
+                root.choose_project_scheduler()
+                # root.choose_project()
+
+        TextField:
+            id: project_name_field
+            pos_hint: {'center_x': 0.5,'center_y': 0.65}
+            hint: "Project Name"
+        TextField:
+            id: screen_name_field
+            pos_hint: {'center_x': 0.5,'center_y': 0.53}
+            hint: "Screen Names"
+            helper_text_mode: "persistent"
+            helper_text: "example: login, signup, main etc"
+        TextField:
+            id: color_field
+            pos_hint: {'center_x': 0.5,'center_y': 0.41}
+            hint: "App colors"
+            helper_text_mode: "on_focus"
+            helper_text: "example: login, signup, main etc"
+        MDGridLayout:
+            # md_bg_color: "red"
+            size_hint_y: None
+            height: "220dp"
+            pos_hint: {'center_x': 0.5,'center_y': 0.19}
+            cols: 2
+            MyCheckButton:
+                id: database_
+                text: "Use Database"
+                on_checked: root.database_dialog()
+                # pos_hint: {'center_x': 0.5,'center_y': 0.4}
+            MyCheckButton:
+                id: hotreload_
+                text: "Use Hotreload"
+                # pos_hint: {'center_x': 0.99,'center_y': 0.4}
+            MyCheckButton:
+                id: simple_
+                text: "Simple Project"
+        MDFillRoundFlatButton:
+            md_bg_color: "purple"
+            text: "Build Project"
+            bold: True
+            font_size: "18sp"
+            font_name: 'Roboto-Bold'
+            size_hint_x: .8
+            size_hint_y: .08
+            pos_hint: {'center_x': 0.5,'center_y': 0.07}
+            on_press:
+                root.loader()
+                # root.build_project()

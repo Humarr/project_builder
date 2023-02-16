@@ -1,0 +1,125 @@
+from pyrebase import pyrebase
+# from models.androidly import Storage
+from kivy.storage.jsonstore import JsonStore
+# from widgets.notify import Notify
+from kvdroid.tools.path import sdcard
+
+#
+config = {
+    'apiKey': "AIzaSyAApNPZ3UXPnr8tX090xiCf8WmMAXCbkm4",
+    'authDomain': "moneywatcher1.firebaseapp.com",
+    'databaseURL': "https://moneywatcher1-default-rtdb.asia-southeast1.firebasedatabase.app",
+    'projectId': "moneywatcher1",
+    'storageBucket': "moneywatcher1.appspot.com",
+    'messagingSenderId': "342556134968",
+    'appId': "1:342556134968:web:afd9a5f520f152d414a0cd",
+    'measurementId': "G-37FP9VHDGN"
+}
+
+firebase = pyrebase.initialize_app(config)
+
+
+class FirebaseManager:
+    def __init__(self):
+        """
+        The __init__ function is called the constructor and is automatically called when you create a new object.
+        The primary purpose of this function is to initialize all variables that are owned by the specific instance of a class.
+
+        :param self: Refer to the object itself
+        :return: The auth, database and storage objects
+        :doc-author: Trelent
+        """
+
+        self.auth = firebase.auth()
+        self.db = firebase.database()
+        self.storage = firebase.storage()
+        self.path = sdcard()
+        # self.path = Storage().storage()
+
+    def firebase_database_login(self, email, password):
+        """
+        The firebase_database_login function logs into the firebase database and returns a user object. 
+        The function takes two arguments, email and password, which are used to log in to the database.
+
+        :param self: Reference the class itself
+        :param email: Store the email address of the user
+        :param password: Authenticate the user
+        :return: A dictionary containing the user's authentication token
+        :doc-author: Trelent
+        """
+
+        try:
+            self.auth.sign_in_with_email_and_password(email, password)
+        except Exception as e:
+            print(f"singin error: {e}")
+
+    def firebase_database_signup(self, email, password):
+        """
+        The firebase_database_signup function creates a new user in the Firebase database.
+        It takes two arguments, email and password, which are both strings.
+
+        :param self: Access the variables and methods of the class in python
+        :param email: Store the email of the user
+        :param password: Set the password of the user
+        :return: A json object containing the user's unique id and auth token
+        :doc-author: Trelent
+        """
+
+        try:
+            self.auth.create_user_with_email_and_password(email, password)
+        except Exception as e:
+            print(f"singup error: {e}")
+
+    def add_user(self, name, email, password):
+        """
+        The add_user function adds a user to the database.
+        It takes three parameters: name, email and password.
+
+
+        :param self: Access the class attributes and methods
+        :param name: Store the name of the user
+        :param email: Check if the email already exists in the database
+        :param password: Encrypt the password
+        :return: None
+        :doc-author: Trelent
+        """
+
+        data = {
+            "name": name,
+            "email": email,
+            "password": password
+        }
+        signup_store = JsonStore(f"{self.path}/signup.json")
+        try:
+            res = self.db.child("users").get()
+            print(f"res: {res.val()}")
+            print(f"res: {res.key()}")
+            for user in res.each():
+                print(user.val())
+                if user.val()['email'] == email:
+                    # Notify().notify("Email already exists", error=True)
+                    break
+            else:
+                email = email.replace(".", "-")
+                self.db.child("users").child(email).set(data)
+
+                signup_store.delete("value")
+        except (ConnectionAbortedError, ConnectionError, ConnectionRefusedError, ConnectionResetError, Exception) as e:
+            print(e)
+
+            signup_store.put("values", name=name,
+                             email=email, password=password, )
+            # Notify().notify("No or Weak network connection", error=True)
+
+    def fetch_user(self, email):
+        res = self.db.child("users").get()
+        print(f"res: {res.val()}")
+        print(f"res: {res.key()}")
+        for user in res.each():
+            print(user.val())
+            if user.val()['email'] == email:
+                break
+
+
+# FirebaseManager().add_user("umar", "emailer@email.com", "12345")
+# FirebaseManager().fetch_user("emailer")

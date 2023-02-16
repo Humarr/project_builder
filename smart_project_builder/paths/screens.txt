@@ -1,0 +1,6 @@
+
+    "screen_name": {
+        "import": "from controllers.screen_name import name_of_screen",
+        "object": "name_of_screen()",
+        "kv": "views/screen_name.kv"
+    },

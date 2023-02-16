@@ -1,0 +1,86 @@
+
+from kivy.uix.screenmanager import ScreenManager, CardTransition
+from kivy.metrics import dp, sp
+from kivy.clock import Clock
+from kivy.storage.jsonstore import JsonStore
+
+from kivy.properties import ListProperty
+from models.androidly import Storage
+from widgets.button import RoundButton, FlatButton
+
+
+
+from widgets.popup import Pop
+
+
+
+
+class WindowManager(ScreenManager):
+    # def __init__(self, **kwargs):
+    #     super().__init__(**kwargs)
+
+    path = Storage().storage()
+    print(path)
+    screens_store = JsonStore("models/screens.json")
+    screen_history = ListProperty()
+
+
+    def change_screen(self, screen_name, __from_goback=False):
+        # self.wm.current = screen_name
+        # checks if the screen already exists in the screen manager
+        # if the screen is not yet in the screen manager,
+        if not self.has_screen(screen_name):
+            # gets the key screen name from the screens.json file
+            getter = self.screens_store.get(screen_name)
+            # executes the value of the import key in the screens.json file
+            exec(getter['import'])
+            print(getter['object'])
+            print(getter['import'])
+            # calls the screen class to get the instance of it
+            screen_object = eval(getter["object"])
+            # automatically sets the screen name using the arg that passed in set_current
+            screen_object.name = screen_name
+            # Builder.load_file(getter['kv'])
+            # finnaly adds the screen to the screen-manager
+            self.add_widget(screen_object)
+            # changes the screen to the specified screen
+            # self.current = screen_name
+            # Builder.load_file(getter['kv'])
+
+        # if the screens is already in the screen manager,
+        # changes the screen to the specified screen
+        self.current = screen_name
+
+        # if not __from_goback:
+        if screen_name != "loader":
+            self.screen_history.append({"name": screen_name, })
+
+
+
+    def goback(self):
+        if len(self.screen_history) > 1:
+            self.screen_history.pop()
+            prev_screen = self.screen_history[-1]
+            print(self.screen_history)
+            print(prev_screen)
+
+            self.change_screen(prev_screen["name"])
+
+    def logout(self):
+        self.change_screen("login")
+
+    def pop_exit(self):
+        exit_btn = RoundButton(text="Exit", md_bg_color=self.colors.get(
+            "orange"), on_press=lambda *args: self.exit())
+        cancel_btn = FlatButton(
+            text="Go back", on_press=lambda *args: self.do_not_exit())
+        self.exit_popup = Pop(title="Close app", text="Are you sure you want to exit app?", buttons=[
+                              cancel_btn, exit_btn])
+
+        self.exit_popup.open()
+
+    def do_not_exit(self, *args):
+        self.exit_popup.dismiss()
+
+    def exit(self, *args):
+        self.stop()
